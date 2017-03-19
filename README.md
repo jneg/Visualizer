@@ -1,2 +1,0 @@
-# Visualizer
-DDDW Visualizer
