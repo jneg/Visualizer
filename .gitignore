@@ -1,3 +1,6 @@
-node_modules/
-Old/
-Logs/
+node_modules
+Old
+Logs
+*.log
+*.csv
+.DS_Store
