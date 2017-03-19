@@ -1,0 +1,37 @@
+doctype html
+html(lang='en')
+  head
+    include /pug/csslibs.pug
+    include /pug/customcss.pug
+    title DDDW !{stateName} !{table} Scripts
+  body
+    include nav.pug
+    div(class='ui container')
+      div(class='ui basic center aligned segment')
+        h2(class='ui header') !{stateName} !{table} Script History
+        table(id='history' class='ui very basic center aligned sortable table')
+          thead
+            tr
+              th Date
+              th Script
+              th Execution Type
+              th Inserted
+              th Modified
+              th Deleted
+          tbody
+            each script in scripts_history
+              tr
+                td=script.date
+                if script.status === 'Updated'
+                  td(class='positive')=script.script
+                else if script.status === 'Outdated'
+                  td(class='warning')=script.script
+                else
+                  td(class='error')=script.script
+                td=script.exec_type
+                td=script.inserted
+                td=script.modified
+                td=script.deleted
+    include /pug/jslibs.pug
+    include /pug/tablesort.pug
+    script(src='/js/invoke-popup.js')

@@ -1,0 +1,297 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="css/custom.css">
+    <title>Live Visualizer</title>
+  </head>
+  <body>
+    <div id="mount">
+      <visualizer/>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.2.2/vue.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/us-map/1.0.1/jquery.usmap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+    <script>
+var socket = io("http://dw.digitaldemocracy.org");
+Vue.component('inscription', {
+  'template': '<div class="ui basic center aligned segment"><h2 class="ui header">Data Warehouse Visualizer</h2></div>'
+});
+
+Vue.component('status-map', {
+  'template': '<div class="ui center aligned basic segment"><h3 class="ui header">Status Map</h3><div id="status-map" style="width:100%;height:500px;"></div></div>',
+  'data': function () {
+    return {
+      'map': []
+    };
+  },
+  'methods': {
+    'renderMap': function () {
+      var colors = {'Updated': '#8fcf83', 'Outdated': '#fff789', 'Failure': '#ef5a5a'};
+
+      var stateColors = {};
+      for (var i = 0; i < this.map.length; i++) {
+        stateColors[this.map[i].state] = {'fill': colors[this.map[i].status]};
+      }
+
+      $('#status-map').usmap({
+        'stateStyles': {'fill': '#FFFFFF', 'stroke': '#777777'},
+        'stateHoverStyles': {'fill': '#add8e6'},
+        'stateSpecificStyles': stateColors
+      });
+    }
+  },
+  'mounted': function () {
+    socket.on('map', function (m) {
+      this.map = m;
+      this.renderMap();
+    }.bind(this));
+  }
+});
+
+Vue.component('schedules', {
+  'template': '<div class="ui center aligned basic segment">' +
+    '<h3 class="ui header">Schedules</h3>' +
+    '<div class="ui transparent left icon input"><input v-model="filter.name" placeholder="Name"/><i class="calendar icon"/></div>' +
+    '<div class="ui transparent left icon input"><input v-model="filter.time" placeholder="Time"/><i class="wait icon"/></div>' +
+    '<table class="ui very basic center aligned sorted table">' +
+    '<thead><tr><th>Name</th><th>Time (UTC)</th><th># of Scripts</th><th>Actions</th></tr></thead>' +
+    '<tbody><tr v-for="schedule in filteredSchedules" class="filteredSchedules" :id="schedule.sched_id">' +
+    '<td>{{schedule.name}}</td>' +
+    '<td>{{schedule.day}} {{schedule.time}}</td>' +
+    '<td>{{schedule.numScripts}}</td>' +
+    '<td><button @click="updateSchedule(schedule.sched_id)" class="ui basic circular button" data-tooltip="Update" data-position="top center"><i class="write icon"></i></button><button @click="deleteSchedule(schedule.sched_id)" id="deleteScheduleButton" class="ui basic circular button" data-tooltip="Delete" data-position="top center"><i id="deleteScheduleIcon" class="minus icon"></i></button><button @click="executeSchedule(schedule.sched_id)" id="executeScheduleButton" class="ui basic circular button" data-tooltip="Execute" data-position="top center"><i id="executeScheduleIcon" class="play icon"></i></button></td>' +
+    '</tr></tbody></table>' +
+    '<div class="ui basic segment">' +
+    '<div class="ui transparent left icon input"><input v-model="createScheduleName" placeholder="Name"/><i class="tag icon"/></div>' +
+    '<button @click="createSchedule" id="createScheduleButton" class="ui basic circular button" data-tooltip="Create" data-position="right center" style="color:#00B5AD!important"><i id="createScheduleIcon" class="plus icon"></i></button>' +
+    '</div></div>',
+  'data': function () {
+    return {
+      'filter': {
+        'name': '',
+        'time': ''
+      },
+      'schedules': [],
+      'createScheduleName': ''
+    };
+  },
+  'computed': {
+    'filteredSchedules': function () {
+      return this.schedules.filter(function (v) {
+        return v.name.includes(this.filter.name) && (v.day + " " + v.time).includes(this.filter.time);
+      }, this);
+    }
+  },
+  'methods': {
+    'createSchedule': function () {
+      var disableCreate = function () {
+        $('#createScheduleIcon').removeClass();
+        $('#createScheduleIcon').addClass('spinner icon');
+        $('#createScheduleButton').prop('disabled', true);
+      }
+      var enableCreate = function () {
+        $('#createScheduleIcon').removeClass();
+        $('#createScheduleIcon').addClass('plus icon');
+        $('#createScheduleButton').prop('disabled', false);
+      }
+      //disableCreate();
+      socket.emit('createSchedule', {"name": this.createScheduleName, "day": "Daily", "time": "00:00:00"});
+      this.createScheduleName = '';
+    },
+    'updateSchedule': function (schId) {
+    },
+    'deleteSchedule': function (schId) {
+      var disableDelete = function () {
+        $('.filteredSchedules#' + schId).find('#deleteScheduleIcon').removeClass();
+        $('.filteredSchedules#' + schId).find('#deleteScheduleIcon').addClass('spinner icon');
+        $('.filteredSchedules#' + schId).find('#deleteScheduleButton').prop('disabled', true);
+      }
+      var enableDelete = function () {
+        $('.filteredSchedules#' + schId).find('#deleteScheduleIcon').removeClass();
+        $('.filteredSchedules#' + schId).find('#deleteScheduleIcon').addClass('minus icon');
+        $('.filteredSchedules#' + schId).find('#deleteScheduleButton').prop('disabled', false);
+      }
+      //disableDelete();
+      socket.emit('deleteSchedule', {"schId": schId});
+    },
+    'executeSchedule': function (schId) {
+      var disableExecute = function () {
+        $('.filteredSchedules#' + schId).find('#executeScheduleIcon').removeClass();
+        $('.filteredSchedules#' + schId).find('#executeScheduleIcon').addClass('spinner icon');
+        $('.filteredSchedules#' + schId).find('#executeScheduleButton').prop('disabled', true);
+      }
+      var enableExecute = function () {
+        $('.filteredSchedules#' + schId).find('#executeScheduleIcon').removeClass();
+        $('.filteredSchedules#' + schId).find('#executeScheduleIcon').addClass('play icon');
+        $('.filteredSchedules#' + schId).find('#executeScheduleButton').prop('disabled', false);
+      }
+      //disableExecute();
+      socket.emit('executeSchedule', {"schId": schId});
+    }
+  },
+  'created': function () {
+    socket.on('schedules', function (s) {
+      this.schedules = s;
+    }.bind(this));
+  },
+  'updated': function () {
+    $('.basic.button').popup();
+  }
+});
+
+Vue.component('scripts', {
+  'template': '<div class="ui center aligned basic segment">' +
+    '<h3 class="ui header">Scripts</h3>' +
+    '<div class="ui transparent left icon input"><input v-model="filter.status" placeholder="Status"/><i class="heartbeat icon"/></div>' +
+    '<div class="ui transparent left icon input"><input v-model="filter.name" placeholder="Name"/><i class="code icon"/></div>' +
+    '<div class="ui transparent left icon input"><input v-model="filter.state" placeholder="State"/><i class="map pin icon"/></div>' +
+    '<table class="ui very basic center aligned sorted table">' +
+    '<thead><tr><th>Name</th><th>State</th><th>Actions</th></tr></thead>' +
+    '<tbody><tr v-for="script in filteredScripts" class="filteredScripts" :id="script.sid">' +
+    '<td :class="script.status">{{script.name}}</td>' +
+    '<td>{{script.state}}</td>' +
+    '<td><button @click="historyScript(script.sid)" class="ui basic circular button" data-tooltip="History" data-position="top center"><i class="list icon"></i></button><button @click="updateScript(script.sid)" class="ui basic circular button" data-tooltip="Update" data-position="top center"><i class="write icon"></i></button><button @click="deleteScript(script.sid)" id="deleteScriptButton" class="ui basic circular button" data-tooltip="Delete" data-position="top center"><i id="deleteScriptIcon" class="minus icon"></i></button><button @click="executeScript(script.sid)" id="executeScriptButton" class="ui basic circular button" data-tooltip="Execute" data-position="top center"><i id="executeScriptIcon" class="play icon"></i></button></td>' +
+    '</tr></tbody></table>' +
+    '<div class="ui basic segment">' +
+    '<div class="ui transparent left icon input"><input v-model="createScriptName" placeholder="Name"/><i class="code icon"/></div>' +
+    '<div class="ui transparent left icon input"><input v-model="createScriptPath" placeholder="Path"/><i class="folder open outline icon"/></div>' +
+    '<div class="ui transparent left icon input"><input v-model="createScriptState" placeholder="State"/><i class="map pin icon"/></div>' +
+    '<button @click="createScript" id="createScriptButton" class="ui basic circular button" style="color:#00B5AD!important" data-tooltip="Create" data-position="right center"><i id="createScriptIcon" class="plus icon"></i></button>' +
+    '</div></div>',
+  'data': function () {
+    return {
+      'filter': {
+        'status': '',
+        'name': '',
+        'state': ''
+      },
+      'scripts': [],
+      'createScriptName': '',
+      'createScriptPath': '',
+      'createScriptState': ''
+    };
+  },
+  'computed': {
+    'filteredScripts': function () {
+      return this.scripts.filter(function (v) {
+        return v.status.includes(this.filter.status) && v.name.includes(this.filter.name) && v.state.includes(this.filter.state);
+      }, this);
+    }
+  },
+  'methods': {
+    'createScript': function () {
+      var disableCreate = function () {
+        $('#createScriptIcon').removeClass();
+        $('#createScriptIcon').addClass('spinner icon');
+        $('#createScriptButton').prop('disabled', true);
+      }
+      var enableCreate = function () {
+        $('#createScriptIcon').removeClass();
+        $('#createScriptIcon').addClass('plus icon');
+        $('#createScriptButton').prop('disabled', false);
+      }
+      //disableCreate();
+      socket.emit('createScript', {"name": this.createScriptName, "path": this.createScriptPath, "state": this.createScriptState});
+      this.createScriptName = '';
+      this.createScriptPath = '';
+      this.createScriptState = '';
+    },
+    'historyScript': function (sid) {
+    },
+    'updateScript': function (sid) {
+    },
+    'deleteScript': function (sid) {
+      var disableDelete = function () {
+        $('.filteredScripts#' + sid).find('#deleteScriptIcon').removeClass();
+        $('.filteredScripts#' + sid).find('#deleteScriptIcon').addClass('spinner icon');
+        $('.filteredScripts#' + sid).find('#deleteScriptButton').prop('disabled', true);
+      }
+      var enableDelete = function () {
+        $('.filteredScripts#' + sid).find('#deleteScriptIcon').removeClass();
+        $('.filteredScripts#' + sid).find('#deleteScriptIcon').addClass('minus icon');
+        $('.filteredScripts#' + sid).find('#deleteScriptButton').prop('disabled', false);
+      }
+      //disableDelete();
+      socket.emit('deleteScript', {"sid": sid});
+    },
+    'executeScript': function (sid) {
+      var disableExecute = function () {
+        $('.filteredScripts#' + sid).find('#executeScriptIcon').removeClass();
+        $('.filteredScripts#' + sid).find('#executeScriptIcon').addClass('spinner icon');
+        $('.filteredScripts#' + sid).find('#executeScriptButton').prop('disabled', true);
+      }
+      var enableExecute = function () {
+        $('.filteredScripts#' + sid).find('#executeScriptIcon').removeClass();
+        $('.filteredScripts#' + sid).find('#executeScriptIcon').addClass('play icon');
+        $('.filteredScripts#' + sid).find('#executeScriptButton').prop('disabled', false);
+      }
+      //disableExecute();
+      console.log('executing script ' + sid)
+      socket.emit('executeScript', {"sid": sid});
+    }
+  },
+  'created': function () {
+    socket.on('scripts', function (s) {
+      this.scripts = s;
+    }.bind(this));
+  },
+  'updated': function () {
+    $('.basic.button').popup();
+  }
+});
+
+Vue.component('journal', {
+  'template': '<div class="ui center aligned basic segment">' +
+    '<h3 class="ui header">Journal</h3>' +
+    '<div class="ui transparent left icon input"><input v-model="filter.moment" placeholder="Moment"/><i class="alarm outline icon"/></div>' +
+    '<div class="ui transparent left icon input"><input v-model="filter.source" placeholder="Source"/><i class="cube icon"/></div>' +
+    '<div class="ui transparent left icon input"><input v-model="filter.message" placeholder="Message"/><i class="comment outline icon"/></div>' +
+    '<table class="ui very basic center aligned sorted table">' +
+    '<thead><tr><th>Jid</th><th>Moment</th><th>Source</th><th>Message</th></tr></thead>' +
+    '<tbody><tr v-for="log in journal">' +
+    '<td>{{log.jid}}</td>' +
+    '<td>{{log.moment}}</td>' +
+    '<td>{{log.source}}</td>' +
+    '<td>{{log.message}}</td>' +
+    '</tr></tbody></table></div>',
+  'data': function () {
+    return {
+      'filter': {
+        'moment': '',
+        'source': '',
+        'message': ''
+      },
+      'journal': []
+    };
+  },
+  'computed': {
+    'filteredJournal': function () {
+      return this.journal.filter(function (v) {
+        return v.moment.includes(this.filter.moment) && v.source.includes(this.filter.source) && v.message.includes(this.filter.message);
+      }, this);
+    }
+  },
+  'created': function () {
+    socket.on('journal', function (j) {
+      this.journal = j;
+    }.bind(this));
+  }
+});
+
+Vue.component('visualizer', {
+  'template': '<div class="ui basic segment"><div class="ui grid">' +
+    '<div class="sixteen wide column"><inscription></inscription></div>' +
+    '<div class="eight wide column"><status-map></status-map><schedules></schedules><scripts></scripts></div>' +
+    '<div class="eight wide column"><journal></journal></div>' +
+    '</div></div>'
+});
+
+new Vue({
+  'el': '#mount'
+});
+    </script>
+  </body>
+</html>

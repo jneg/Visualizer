@@ -1,0 +1,19 @@
+doctype html
+html(lang='en')
+  head
+    include /pug/csslibs.pug
+    include /pug/customcss.pug
+    title DDDW System !{scriptName} Run
+  body
+    include nav.pug
+    div(class='ui container')
+      div(class='ui basic center aligned segment')
+        h2(class='ui header') !{scriptName} Run
+        div(class='ui top attached tabular menu')
+          a(class='active item' data-tab='stdout') Stdout
+          a(class='item' data-tab='stderr') Stderr
+        div(class='ui bottom attached tab segment active' data-tab='stdout')=stdout
+        div(class='ui bottom attached tab segment' data-tab='stderr')=stderr
+    include /pug/jslibs.pug
+    script(src='/js/tab.js')
+    script(src='/js/invoke-popup.js')

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.css'>
+    <title>DDDW Home</title>
+  </head>
+  <body style='background:url("/images/bg.jpg") fixed; background-size:cover;'>
+    <div class='ui top fixed inverted fluid six item secondary pointing menu' style='border-bottom:none;'>
+      <div class='ui container'>
+        <a class='header item' href='http://digitaldemocracy.org'>Digital Democracy</a>
+        <a class='item' href='http://dw.digitaldemocracy.org:9000/dashboards/57b4ddd3a8309441798726da' style='color:white!important;'>Overall</a>
+        <div class='ui dropdown item' style='color:white!important;'>
+          DataWarehouse
+          <div class='menu'>
+            <a class='item' href='/live'>Live</a>
+            <a class='item' href='http://dw.digitaldemocracy.org:9000/search?rangetype=relative&fields=message%2Csource&width=1440&highlightMessage=&relative=604800&q='>Graylog</a>
+          </div>
+        </div>
+        <a class='item' href='http://dw.digitaldemocracy.org:9000/streams/57b4da1aa8309441798722ec/search?rangetype=relative&fields=message%2Csource&width=1600&highlightMessage=&relative=2592000&q=' style='color:white!important;'>Drupal</a>
+        <a class='item' href='http://dw.digitaldemocracy.org:9000/streams/57b4d9f4a8309441798722c3/search?rangetype=relative&fields=message%2Csource&width=1600&highlightMessage=&relative=2592000&q=' style='color:white!important;'>Test</a>
+        <a class='item' href='http://dw.digitaldemocracy.org:9000/streams/57b4da59a83094417987232f/search?rangetype=relative&fields=message%2Csource&width=1600&highlightMessage=&relative=2592000&q=' style='color:white!important;'>Transcription</a>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.0/jquery.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.js'></script>
+    <script src='/js/invoke-dropdown.js'></script>
+  </body>
+</html>

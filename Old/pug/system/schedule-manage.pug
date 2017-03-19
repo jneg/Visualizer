@@ -1,0 +1,201 @@
+doctype html
+html(lang='en')
+  head
+    include /pug/csslibs.pug
+    include /pug/dragula-css.pug
+    include /pug/customcss.pug
+    title DDDW System !{scheduleRow.name} Scripts
+  body
+    include nav.pug
+    div(class='ui container')
+      div(class='ui basic center aligned segment')
+        h2(id='scheduleName' class='ui header' style='margin-bottom:20px;')=scheduleRow.name
+        div(class='ui basic segment')
+          i(class='wait icon' data-content='Time (UTC)' data-variation='small' data-position='bottom center')
+          div(id='day' class='ui inline dropdown')
+            div(class='text') Day
+            div(class='menu')
+              div(class='item') Daily
+              div(class='item') Monday
+              div(class='item') Tuesday
+              div(class='item') Wednesday
+              div(class='item') Thursday
+              div(class='item') Friday
+              div(class='item') Saturday 
+              div(class='item') Sunday
+          |  
+          div(id='hour' class='ui inline dropdown')
+            div(class='text') H
+            div(class='menu')
+              div(class='item') 00
+              div(class='item') 01
+              div(class='item') 02
+              div(class='item') 03
+              div(class='item') 04
+              div(class='item') 05
+              div(class='item') 06
+              div(class='item') 07
+              div(class='item') 08
+              div(class='item') 09
+              div(class='item') 10
+              div(class='item') 11
+              div(class='item') 12
+              div(class='item') 13
+              div(class='item') 14
+              div(class='item') 15
+              div(class='item') 16
+              div(class='item') 17
+              div(class='item') 18
+              div(class='item') 19
+              div(class='item') 20
+              div(class='item') 21
+              div(class='item') 22
+              div(class='item') 23
+          | :
+          div(id='minute' class='ui inline dropdown')
+            div(class='text') M
+            div(class='menu')
+              div(class='item') 00
+              div(class='item') 01
+              div(class='item') 02
+              div(class='item') 03
+              div(class='item') 04
+              div(class='item') 05
+              div(class='item') 06
+              div(class='item') 07
+              div(class='item') 08
+              div(class='item') 09
+              div(class='item') 10
+              div(class='item') 11
+              div(class='item') 12
+              div(class='item') 13
+              div(class='item') 14
+              div(class='item') 15
+              div(class='item') 16
+              div(class='item') 17
+              div(class='item') 18
+              div(class='item') 19
+              div(class='item') 20
+              div(class='item') 21
+              div(class='item') 22
+              div(class='item') 23
+              div(class='item') 24
+              div(class='item') 25
+              div(class='item') 26
+              div(class='item') 27
+              div(class='item') 28
+              div(class='item') 29
+              div(class='item') 30
+              div(class='item') 31
+              div(class='item') 32
+              div(class='item') 33
+              div(class='item') 34
+              div(class='item') 35
+              div(class='item') 36
+              div(class='item') 37
+              div(class='item') 38
+              div(class='item') 39
+              div(class='item') 40
+              div(class='item') 41
+              div(class='item') 42
+              div(class='item') 43
+              div(class='item') 44
+              div(class='item') 45
+              div(class='item') 46
+              div(class='item') 47
+              div(class='item') 48
+              div(class='item') 49
+              div(class='item') 50
+              div(class='item') 51
+              div(class='item') 52
+              div(class='item') 53
+              div(class='item') 54
+              div(class='item') 55
+              div(class='item') 56
+              div(class='item') 57
+              div(class='item') 58
+              div(class='item') 59
+          | :
+          div(id='second' class='ui inline dropdown')
+            div(class='text') S
+            div(class='menu')
+              div(class='item') 00
+              div(class='item') 01
+              div(class='item') 02
+              div(class='item') 03
+              div(class='item') 04
+              div(class='item') 05
+              div(class='item') 06
+              div(class='item') 07
+              div(class='item') 08
+              div(class='item') 09
+              div(class='item') 10
+              div(class='item') 11
+              div(class='item') 12
+              div(class='item') 13
+              div(class='item') 14
+              div(class='item') 15
+              div(class='item') 16
+              div(class='item') 17
+              div(class='item') 18
+              div(class='item') 19
+              div(class='item') 20
+              div(class='item') 21
+              div(class='item') 22
+              div(class='item') 23
+              div(class='item') 24
+              div(class='item') 25
+              div(class='item') 26
+              div(class='item') 27
+              div(class='item') 28
+              div(class='item') 29
+              div(class='item') 30
+              div(class='item') 31
+              div(class='item') 32
+              div(class='item') 33
+              div(class='item') 34
+              div(class='item') 35
+              div(class='item') 36
+              div(class='item') 37
+              div(class='item') 38
+              div(class='item') 39
+              div(class='item') 40
+              div(class='item') 41
+              div(class='item') 42
+              div(class='item') 43
+              div(class='item') 44
+              div(class='item') 45
+              div(class='item') 46
+              div(class='item') 47
+              div(class='item') 48
+              div(class='item') 49
+              div(class='item') 50
+              div(class='item') 51
+              div(class='item') 52
+              div(class='item') 53
+              div(class='item') 54
+              div(class='item') 55
+              div(class='item') 56
+              div(class='item') 57
+              div(class='item') 58
+              div(class='item') 59
+        div(class='ui grid')
+          div(class='eight wide column')
+            h3(class='ui header' style='margin-bottom:8px;') !{scheduleRow.name}
+            div(id='schedule-scripts' class='ui compact segments' style='min-width:200px;min-height:20px;')
+              each script in scheduleScripts
+                div(class='ui segment') !{script.sid} - !{script.name}
+          div(class='eight wide column')
+            h3(class='ui header' style='margin-bottom:8px;') All Scripts
+            div(id='all-scripts' class='ui compact segments')
+              each script in allScripts
+                div(class='ui segment') !{script.sid} - !{script.name}
+        div(class='ui basic segment')
+          button(id='update-schedule' class='ui basic circular button' style='color:#00B5AD!important;margin-right:50px;') Update
+          button(id='delete-schedule' class='ui basic circular button' style='color:#FF4C4C!important;margin-left:50px;') Delete
+    include /pug/jslibs.pug
+    include /pug/dragula-js.pug
+    script(src='/js/invoke-popup.js')
+    script(src='/js/invoke-dropdown.js')
+    script(src='/js/system/schedule-manage.js')
+    script manageSchedule(!{scheduleRowStr})

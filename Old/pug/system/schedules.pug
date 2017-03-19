@@ -1,0 +1,42 @@
+doctype html
+html(lang='en')
+  head
+    include /pug/csslibs.pug
+    include /pug/customcss.pug
+    title DDDW System Schedules
+  body
+    include nav.pug
+    div(class='ui container')
+      div(class='ui basic center aligned segment')
+        h2(class='ui header') Schedules
+        div(class='ui transparent left icon input')
+          input(id='schedule' type='text' placeholder='Schedule')
+          i(class='calendar icon')
+        div(class='ui transparent left icon input')
+          input(id='time' type='text' placeholder='Time')
+          i(class='wait icon')
+        table(id='schedules' class='ui very basic center aligned sortable table')
+          thead
+            tr
+              th Schedule
+              th Time (UTC)
+              th # of Scripts
+              th Actions
+          tbody
+            each schedule in schedules
+              tr(id=schedule.name)
+                td(id='schedule')=schedule.name
+                td(id='time') #{schedule.day} #{schedule.time}
+                td(id='numScripts')=schedule.numScripts
+                td
+                  i(class='options icon' data-content='Manage' data-variation='small' data-position='top center' onclick='window.location.href="' + base_uri + schedule.sched_id + '/manage"')
+                  // i(class='chevron right icon' data-content='Run' data-variation='small' data-position='top center' onclick='window.location.href="' + base_uri + schedule.sched_id + '/run"')
+        div(class='ui basic segment')
+          div(class='ui transparent left icon input')
+            input(id='schedule-name' type='text' placeholder='Schedule Name')
+            i(class='add to calendar icon')
+          button(id='create-schedule' class='ui basic circular button' style='color:#00B5AD!important;') Create
+    include /pug/jslibs.pug
+    include /pug/tablesort.pug
+    script(src='/js/invoke-popup.js')
+    script(src='/js/system/schedules.js')
