@@ -6,6 +6,7 @@ const Map = require('./Dao/Map');
 const Schedule = require('./Dao/Schedule');
 const Script = require('./Dao/Script');
 const Journal = require('./Dao/Journal');
+const ScriptHistory = require('./Dao/ScriptHistory');
 
 const server = Express();
 server.use(BodyParser.json())
@@ -72,6 +73,10 @@ io.on('connection', function (socket) {
 
   socket.on('executeScript', (data) => {
     if (data.hasOwnProperty('sid')) execFile(overlord, ['script', data.sid], () => {});
+  });
+
+  socket.on('historyScript', (data) => {
+    if (data.hasOwnProperty('sid')) ScriptHistory.getScriptHistory(data.sid, (scriptHistory) => socket.emit('scriptHistory', scriptHistory));
   });
 });
 

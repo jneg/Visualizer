@@ -87,48 +87,15 @@ Vue.component('schedules', {
   },
   'methods': {
     'createSchedule': function () {
-      var disableCreate = function () {
-        $('#createScheduleIcon').removeClass();
-        $('#createScheduleIcon').addClass('spinner icon');
-        $('#createScheduleButton').prop('disabled', true);
-      }
-      var enableCreate = function () {
-        $('#createScheduleIcon').removeClass();
-        $('#createScheduleIcon').addClass('plus icon');
-        $('#createScheduleButton').prop('disabled', false);
-      }
-      //disableCreate();
       socket.emit('createSchedule', {"name": this.createScheduleName, "day": "Daily", "time": "00:00:00"});
       this.createScheduleName = '';
     },
     'updateSchedule': function (schId) {
     },
     'deleteSchedule': function (schId) {
-      var disableDelete = function () {
-        $('.filteredSchedules#' + schId).find('#deleteScheduleIcon').removeClass();
-        $('.filteredSchedules#' + schId).find('#deleteScheduleIcon').addClass('spinner icon');
-        $('.filteredSchedules#' + schId).find('#deleteScheduleButton').prop('disabled', true);
-      }
-      var enableDelete = function () {
-        $('.filteredSchedules#' + schId).find('#deleteScheduleIcon').removeClass();
-        $('.filteredSchedules#' + schId).find('#deleteScheduleIcon').addClass('minus icon');
-        $('.filteredSchedules#' + schId).find('#deleteScheduleButton').prop('disabled', false);
-      }
-      //disableDelete();
       socket.emit('deleteSchedule', {"schId": schId});
     },
     'executeSchedule': function (schId) {
-      var disableExecute = function () {
-        $('.filteredSchedules#' + schId).find('#executeScheduleIcon').removeClass();
-        $('.filteredSchedules#' + schId).find('#executeScheduleIcon').addClass('spinner icon');
-        $('.filteredSchedules#' + schId).find('#executeScheduleButton').prop('disabled', true);
-      }
-      var enableExecute = function () {
-        $('.filteredSchedules#' + schId).find('#executeScheduleIcon').removeClass();
-        $('.filteredSchedules#' + schId).find('#executeScheduleIcon').addClass('play icon');
-        $('.filteredSchedules#' + schId).find('#executeScheduleButton').prop('disabled', false);
-      }
-      //disableExecute();
       socket.emit('executeSchedule', {"schId": schId});
     }
   },
@@ -183,53 +150,20 @@ Vue.component('scripts', {
   },
   'methods': {
     'createScript': function () {
-      var disableCreate = function () {
-        $('#createScriptIcon').removeClass();
-        $('#createScriptIcon').addClass('spinner icon');
-        $('#createScriptButton').prop('disabled', true);
-      }
-      var enableCreate = function () {
-        $('#createScriptIcon').removeClass();
-        $('#createScriptIcon').addClass('plus icon');
-        $('#createScriptButton').prop('disabled', false);
-      }
-      //disableCreate();
       socket.emit('createScript', {"name": this.createScriptName, "path": this.createScriptPath, "state": this.createScriptState});
       this.createScriptName = '';
       this.createScriptPath = '';
       this.createScriptState = '';
     },
     'historyScript': function (sid) {
+      socket.emit('historyScript', {"sid": sid});
     },
     'updateScript': function (sid) {
     },
     'deleteScript': function (sid) {
-      var disableDelete = function () {
-        $('.filteredScripts#' + sid).find('#deleteScriptIcon').removeClass();
-        $('.filteredScripts#' + sid).find('#deleteScriptIcon').addClass('spinner icon');
-        $('.filteredScripts#' + sid).find('#deleteScriptButton').prop('disabled', true);
-      }
-      var enableDelete = function () {
-        $('.filteredScripts#' + sid).find('#deleteScriptIcon').removeClass();
-        $('.filteredScripts#' + sid).find('#deleteScriptIcon').addClass('minus icon');
-        $('.filteredScripts#' + sid).find('#deleteScriptButton').prop('disabled', false);
-      }
-      //disableDelete();
       socket.emit('deleteScript', {"sid": sid});
     },
     'executeScript': function (sid) {
-      var disableExecute = function () {
-        $('.filteredScripts#' + sid).find('#executeScriptIcon').removeClass();
-        $('.filteredScripts#' + sid).find('#executeScriptIcon').addClass('spinner icon');
-        $('.filteredScripts#' + sid).find('#executeScriptButton').prop('disabled', true);
-      }
-      var enableExecute = function () {
-        $('.filteredScripts#' + sid).find('#executeScriptIcon').removeClass();
-        $('.filteredScripts#' + sid).find('#executeScriptIcon').addClass('play icon');
-        $('.filteredScripts#' + sid).find('#executeScriptButton').prop('disabled', false);
-      }
-      //disableExecute();
-      console.log('executing script ' + sid)
       socket.emit('executeScript', {"sid": sid});
     }
   },
@@ -281,11 +215,48 @@ Vue.component('journal', {
   }
 });
 
+Vue.component('scriptHistory', {
+  'template': '<div class="ui center aligned basic segment">' +
+    '<h3 class="ui header">Script {{currentScript}} History</h3>' +
+    '<div class="ui transparent left icon input"><input v-model="filter.status" placeholder="Status"/><i class="heartbeat icon"/></div>' +
+    '<div class="ui transparent left icon input"><input v-model="filter.notes" placeholder="Notes"/><i class="sticky note outline icon"/></div>' +
+    '<table class="ui very basic center aligned sorted table">' +
+    '<thead><tr><th>Hid</th><th>Status</th><th>Notes</th></tr></thead>' +
+    '<tbody><tr v-for="history in filteredHistory">' +
+    '<td>{{history.hid}}</td>' +
+    '<td>{{history.status}}</td>' +
+    '<td>{{history.notes}}</td>' +
+    '</tr></tbody></table></div>',
+  'data': function () {
+    return {
+      'filter': {
+        'status': '',
+        'notes': ''
+      },
+      'scriptHistory': [],
+      'currentScript': ''
+    };
+  },
+  'computed': {
+    'filteredHistory': function () {
+      return this.scriptHistory.filter(function (v) {
+        return v.status.includes(this.filter.status) && v.notes.includes(this.filter.notes);
+      }, this);
+    }
+  },
+  'created': function () {
+    socket.on('scriptHistory', function (scriptHistory) {
+      this.currentScript = scriptHistory[0].sid;
+      this.scriptHistory = scriptHistory;
+    }.bind(this));
+  }
+});
+
 Vue.component('visualizer', {
   'template': '<div class="ui basic segment"><div class="ui grid">' +
     '<div class="sixteen wide column"><inscription></inscription></div>' +
     '<div class="eight wide column"><status-map></status-map><schedules></schedules><scripts></scripts></div>' +
-    '<div class="eight wide column"><journal></journal></div>' +
+    '<div class="eight wide column"><journal></journal><scriptHistory></scriptHistory></div>' +
     '</div></div>'
 });
 
