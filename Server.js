@@ -1,4 +1,5 @@
 const Express = require('express');
+const Pug = require('pug')
 const Session = require('express-session');
 const BodyParser = require('body-parser');
 const execFile = require('child_process').execFile;
@@ -13,22 +14,22 @@ server.use(BodyParser.json())
 server.use(Session({secret: 'frizzle', resave: 'false', saveUninitialized: 'false'}));
 server.use('/images', Express.static('Images'))
 server.use('/js', Express.static('Js'))
-server.use('/css', Express.static('Css'))
+server.use('/bundles', Express.static('Bundles'))
 server.get('/auth/:code', (req, res) => {
   if (req.params.code === 'coronado') req.session.authorized = true;
   res.redirect('/auth');
 });
 server.get('/auth', (req, res) => {
   if (req.session.authorized === true) res.redirect('/');
-  else res.sendFile(__dirname + '/Vue/Auth.html');
+  else res.send(Pug.renderFile(__dirname + '/Pug/Auth.pug'));
 });
 server.get('*', (req, res, next) => {
   if (req.session.authorized === true) next();
   else res.redirect('/auth');
 });
-server.get('/', (req, res) => res.sendFile(__dirname + '/Vue/Home.html'));
-server.get('/live', (req, res) => res.sendFile(__dirname + '/Vue/Visualizer.html'));
-server.get('*', (req, res) => res.sendFile(__dirname + '/Vue/404.html'));
+server.get('/', (req, res) => res.send(Pug.renderFile(__dirname + '/Pug/Home.pug')));
+server.get('/live', (req, res) => res.send(Pug.renderFile(__dirname + '/Pug/Visualizer.pug')));
+server.get('*', (req, res) => res.send(Pug.renderFile(__dirname + '/Pug/404.pug')));
 
 const httpServer = require('http').createServer(server);
 const io = require('socket.io').listen(httpServer);
