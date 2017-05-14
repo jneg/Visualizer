@@ -1,5 +1,5 @@
 <template lang='pug'>
-div(class='ui center aligned basic segment')
+div(v-if="show" class='ui center aligned basic segment')
   h3(class='ui header') Journal
   div(class='ui transparent left icon input')
     input(v-model='filter.moment' placeholder='Moment')
@@ -18,7 +18,7 @@ div(class='ui center aligned basic segment')
         th Source
         th Message
     tbody
-      tr(v-for='log in journal')
+      tr(v-for='log in filteredJournal')
         td {{log.jid}}
         td {{log.moment}}
         td {{log.source}}
@@ -26,17 +26,18 @@ div(class='ui center aligned basic segment')
 </template>
 
 <script>
-import Store from '../Store/Store.js'
+import eventHub from '../EventHub/EventHub.js'
 
 export default {
   data() {
     return {
-      'filter': { 
-        'moment': '',
-        'source': '',
-        'message': ''
+      show: false,
+      filter: { 
+        moment: '',
+        source: '',
+        message: ''
       },
-      'journal': []
+      journal: []
     }
   },
   computed: {
@@ -48,6 +49,12 @@ export default {
   },
   created() {
     this.$options.sockets.journal = (j) => this.journal = j
+    eventHub.$on('hideRightColumn', () => {
+      this.show = false
+    })
+    eventHub.$on('showJournal', () => {
+      this.show = true
+    })
   }
 }
 </script>

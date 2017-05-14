@@ -1,11 +1,14 @@
 <template lang='pug'>
 div(class='ui basic segment')
+  Inscription
   div(class='ui grid')
     div(class='eight wide column')
       StatusMap
       Schedules
       Scripts
+      OpenJournal
     div(class='eight wide column')
-      Journal
+      ManageSchedule
       ScriptHistory
+      Journal
 </template>

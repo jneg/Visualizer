@@ -48,8 +48,20 @@ io.on('connection', function (socket) {
     if (data.hasOwnProperty('name') && data.hasOwnProperty('day') && data.hasOwnProperty('time')) Schedule.createSchedule(data.name, data.day, data.time, () => {});
   });
 
-  socket.on('updateSchedule', (data) => {
-    if (data.hasOwnProperty('schId') && data.hasOwnProperty('name') && data.hasOwnProperty('day') && data.hasOwnProperty('time') && data.hasOwnProperty('sids')) Schedule.updateSchedule(data.schId, data.name, data.day, data.time, data.sids, () => {});
+  socket.on('updateScheduleName', (data) => {
+    if (data.hasOwnProperty('schId') && data.hasOwnProperty('name')) Schedule.updateScheduleName(data.schId, data.name);
+  });
+
+  socket.on('updateScheduleDay', (data) => {
+    if (data.hasOwnProperty('schId') && data.hasOwnProperty('day')) Schedule.updateScheduleDay(data.schId, data.day);
+  });
+
+  socket.on('updateScheduleTime', (data) => {
+    if (data.hasOwnProperty('schId') && data.hasOwnProperty('time')) Schedule.updateScheduleTime(data.schId, data.time);
+  });
+
+  socket.on('updateScheduleSids', (data) => {
+    if (data.hasOwnProperty('schId') && data.hasOwnProperty('sids')) Schedule.updateScheduleSids(data.schId, data.sids);
   });
 
   socket.on('deleteSchedule', (data) => {
@@ -60,8 +72,27 @@ io.on('connection', function (socket) {
     if (data.hasOwnProperty('schId')) execFile(overlord, ['schedule', data.schId], () => {});
   });
 
+  socket.on('manageSchedule', (data) => {
+    if (data.hasOwnProperty('schId')) {
+      Schedule.getManageSchedule(data.schId, (name, day, hour, minute, second, scheduleScripts) => {
+        socket.emit('manageScheduleShow', true);
+        socket.emit('manageScheduleId', data.schId);
+        socket.emit('manageScheduleName', name);
+        socket.emit('manageScheduleDay', day);
+        socket.emit('manageScheduleHour', hour);
+        socket.emit('manageScheduleMinute', minute);
+        socket.emit('manageScheduleSecond', second);
+        socket.emit('manageScheduleScripts', scheduleScripts);
+      });
+      Script.getScripts((scripts) => socket.emit('manageScheduleAllScripts', scripts));
+    }
+  });
+
   socket.on('createScript', (data) => {
-    if (data.hasOwnProperty('name') && data.hasOwnProperty('path') && data.hasOwnProperty('state')) Script.createScript(data.name, data.path, data.state, () => {});
+    if (data.hasOwnProperty('name') && data.hasOwnProperty('path') && data.hasOwnProperty('state')) {
+// Below is where the DAO function is called with arguments passed by the cleint (from the Vue files)
+      Script.createScript(data.name, data.path, data.state, () => {})
+    }
   });
 
   socket.on('updateScript', (data) => {
@@ -79,6 +110,7 @@ io.on('connection', function (socket) {
   socket.on('historyScript', (data) => {
     if (data.hasOwnProperty('sid')) ScriptHistory.getScriptHistory(data.sid, (scriptHistory) => socket.emit('scriptHistory', scriptHistory));
   });
+  
 });
 
 const port = 80;

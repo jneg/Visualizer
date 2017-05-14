@@ -20,7 +20,7 @@ div(class='ui center aligned basic segment')
         td {{schedule.day}} {{schedule.time}}
         td {{schedule.numScripts}}
         td
-          button(@click='updateSchedule(schedule.sched_id)' class='ui basic circular button' data-tooltip='Update' data-position='top center')
+          button(@click='manageSchedule(schedule.sched_id)' class='ui basic circular button' data-tooltip='Manage' data-position='top center')
             i(class='write icon')
           button(@click='deleteSchedule(schedule.sched_id)' class='ui basic circular button' data-tooltip='Delete' data-position='top center')
             i(class='minus icon')
@@ -35,6 +35,8 @@ div(class='ui center aligned basic segment')
 </template>
 
 <script>
+import eventHub from '../EventHub/EventHub.js'
+
 export default {
   data() {
     return {
@@ -56,8 +58,10 @@ export default {
       this.$socket.emit('createSchedule', {'name': this.createScheduleName, 'day': 'Daily', 'time': '00:00:00'})
       this.createScheduleName = ''
     },
-    updateSchedule(schId) {
-
+    manageSchedule(schId) {
+      eventHub.$emit('hideRightColumn')
+      this.$socket.emit('manageSchedule', {'schId': schId})
+      window.scroll(0,0)
     },
     deleteSchedule(schId) {
       this.$socket.emit('deleteSchedule', {'schId': schId})
@@ -68,6 +72,6 @@ export default {
   },
   created() {
     this.$options.sockets.schedules = (s) => this.schedules = s
-  },
+  }
 }
 </script>

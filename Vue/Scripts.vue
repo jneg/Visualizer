@@ -8,7 +8,7 @@ div(class='ui center aligned basic segment')
     input(v-model='filter.name' placeholder='Name')
     i(class='code icon')
   div(class='ui transparent left icon input')
-    input(v-model='filter.state' placeholder='State')
+    input(v-model='filter.state' id='scriptStateFilter' placeholder='State')
     i(class='map pin icon')
   table(class='ui very basic center aligned sorted table')
     thead
@@ -44,6 +44,8 @@ div(class='ui center aligned basic segment')
 </template>
 
 <script>
+import eventHub from '../EventHub/EventHub.js'
+
 export default {
   data() {
     return {
@@ -66,18 +68,25 @@ export default {
   methods: {
     createScript() {
       this.$socket.emit('createScript', {'name': this.createScriptName, 'path': this.createScriptPath, 'state': this.createScriptState})
+      // If statement to check if any of the fields are empty
       this.createScriptName = ''
       this.createScriptPath = ''
       this.createScriptState = ''
     },
     historyScript(sid) {
+      eventHub.$emit('hideRightColumn')
       this.$socket.emit('historyScript', {'sid': sid})
+      window.scroll(0, 0)
     },
     updateScript(sid) {
 
     },
     deleteScript(sid) {
-      this.$socket.emit('deleteScript', {'sid': sid})
+      var r = confirm("Are you sure you want to delete this script?")
+      
+      if (r == true) {
+         this.$socket.emit('deleteScript', {'sid': sid})
+      }
     },
     executeScript(sid) {
       this.$socket.emit('executeScript', {'sid': sid})
@@ -85,6 +94,11 @@ export default {
   },
   created() {
     this.$options.sockets.scripts = (s) => this.scripts = s
+  },
+  mounted() {
+    eventHub.$on('setFilterState', (stateName) => {
+      this.filter.state = stateName;
+    })
   }
 }
 </script>
