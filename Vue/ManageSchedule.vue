@@ -2,8 +2,9 @@
 div(v-if="show" class='ui center aligned basic segment')
   h3(class='ui header') Manage {{name}} ({{schId}})
   div(class='basic ui segment')
-    input(v-model='name' type='text')
-    select(v-model='day')
+    div(class='ui input')
+      input(v-model='name' type='text')
+    select(v-model='day' class='ui dropdown')
       option Daily
       option Monday
       option Tuesday
@@ -12,7 +13,7 @@ div(v-if="show" class='ui center aligned basic segment')
       option Friday
       option Saturday
       option Sunday
-    select(v-model='hour')
+    select(v-model='hour' class='ui dropdown')
       option 00
       option 01
       option 02
@@ -38,7 +39,7 @@ div(v-if="show" class='ui center aligned basic segment')
       option 22
       option 23
     | :
-    select(v-model='minute')
+    select(v-model='minute' class='ui dropdown')
       option 00
       option 01
       option 02
@@ -100,7 +101,7 @@ div(v-if="show" class='ui center aligned basic segment')
       option 58
       option 59
     | :
-    select(v-model='second')
+    select(v-model='second' class='ui dropdown')
       option 00
       option 01
       option 02
@@ -168,7 +169,7 @@ div(v-if="show" class='ui center aligned basic segment')
         button(@click="removeScheduleScript(i)" class="ui basic circular button" data-tooltip='Remove' data-position='right center' style="color:rgb(0,0,0,0.8)!important;")
           i(class="minus icon")
   div(class='ui basic segment')
-    select(v-model='appendScript')
+    select(v-model='appendScript' class='ui dropdown')
       option(selected disabled) Append Script
       option(v-for='s in allScripts') {{s.sid}} : {{s.name}}
 </template>
