@@ -9,8 +9,6 @@ const scheduleAll = () => `select sch.sched_id, sch.name, sch.day, sch.time, cou
 
 const scheduleCreate = (name, day, time) => `insert into Schedule (name, day, time) values ("${name}", "${day}", "${time}")`;
 
-const scheduleUpdate = (schId, name, day, time) => `update Schedule set name = "${name}", day = "${day}", time = "${time}" where sched_id = ${schId}`;
-
 const scheduleUpdateName = (schId, name) => `update Schedule set name = "${name}" where sched_id = ${schId}`;
 
 const scheduleUpdateDay = (schId, day) => `update Schedule set day = "${day}" where sched_id = ${schId}`;
