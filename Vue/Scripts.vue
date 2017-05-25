@@ -67,11 +67,20 @@ export default {
   },
   methods: {
     createScript() {
-      this.$socket.emit('createScript', {'name': this.createScriptName, 'path': this.createScriptPath, 'state': this.createScriptState})
-      // If statement to check if any of the fields are empty
-      this.createScriptName = ''
-      this.createScriptPath = ''
-      this.createScriptState = ''
+      if (this.createScriptName == '' || this.createScriptPath == '') {
+        alert("Script name and Script path must not be empty");
+      }
+      // Hard coded state check
+      else if (this.createScriptState != 'CA' && this.createScriptName != 'NY') {
+        alert("State does not exist in the database");
+      }
+      else {
+        this.$socket.emit('createScript', {'name': this.createScriptName, 'path': this.createScriptPath, 'state': this.createScriptState})
+        // If statement to check if any of the fields are empty
+        this.createScriptName = ''
+        this.createScriptPath = ''
+        this.createScriptState = ''
+      }
     },
     historyScript(sid) {
       eventHub.$emit('hideRightColumn')

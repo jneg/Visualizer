@@ -14,7 +14,6 @@ import OpenJournal from './Vue/OpenJournal.vue'
 import './Stylus/Custom.styl'
 
 Vue.use(VueSocketio, 'http://dw.digitaldemocracy.org:80')
-Vue.use(VueSocketio, Socketio('http://dw.digitaldemocracy.org:80'))
 
 Vue.component('Inscription', Inscription)
 Vue.component('StatusMap', StatusMap)

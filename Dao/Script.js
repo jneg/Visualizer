@@ -11,6 +11,11 @@ const scriptUpdate = (sid, name, path, state, current) => `update Script set nam
 
 const scriptDelete = (sid) => `update Script set current = 0 where sid = ${sid}`;
 
+/*
+// Added code to check for all states
+const statesGet = () => `select * from State`;
+*/
+
 exports.getScripts = (cb) => Conn.getConn().query(scriptAll(), (err, data) => cb(DaoHelper.formatNulls(data)));
 
 exports.createScript = (name, path, state) => Conn.getConn().query(scriptCreate(name, path, state), (err, data) => {});
@@ -26,3 +31,10 @@ exports.deleteScript = (sid, cb) => {
     if (data.length == 1) Conn.getConn().query(scriptDelete(sid), (err, data) => {});
   });
 }
+
+/*
+// More added code checking for all states
+exports.getStates = (cb) => {
+  Conn.getConn().query(statesGet(), (err, data) => cb(DaoHelper.formatNulls(data)));
+}
+*/

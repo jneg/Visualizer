@@ -34,6 +34,7 @@ server.get('*', (req, res) => res.send(Pug.renderFile(__dirname + '/Pug/404.pug'
 const httpServer = require('http').createServer(server);
 const io = require('socket.io').listen(httpServer);
 io.on('connection', function (socket) {
+  console.log('connected: ' + socket.id);
   const overlord = '/home/jnegahba/Overlord/Overlord.py';
   const sendModel = () => {
     Map.getMap((map) => socket.emit('map', map));
@@ -42,7 +43,7 @@ io.on('connection', function (socket) {
     Journal.getJournal((journal) => socket.emit('journal', journal));
   };
   sendModel();
-  setInterval(sendModel, 1000);
+  const models = setInterval(sendModel, 1000);
 
   socket.on('createSchedule', (data) => {
     if (data.hasOwnProperty('name') && data.hasOwnProperty('day') && data.hasOwnProperty('time')) Schedule.createSchedule(data.name, data.day, data.time, () => {});
@@ -92,6 +93,10 @@ io.on('connection', function (socket) {
     if (data.hasOwnProperty('name') && data.hasOwnProperty('path') && data.hasOwnProperty('state')) {
 // Below is where the DAO function is called with arguments passed by the cleint (from the Vue files)
       Script.createScript(data.name, data.path, data.state, () => {})
+/*
+// Testing below
+      Script.getStates((states) => socket.emit('states', states));
+*/
     }
   });
 
@@ -110,7 +115,11 @@ io.on('connection', function (socket) {
   socket.on('historyScript', (data) => {
     if (data.hasOwnProperty('sid')) ScriptHistory.getScriptHistory(data.sid, (scriptHistory) => socket.emit('scriptHistory', scriptHistory));
   });
-  
+
+  socket.on('disconnect', () => {
+    console.log('disconnected: ' + socket.id);
+    clearInterval(models);
+  });
 });
 
 const port = 80;
